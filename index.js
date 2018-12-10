@@ -8,17 +8,11 @@ let api = new Router()
 app.use(jsonp())
 
 api.get('/', async(ctx) => {
-    ctx.body = {
-        status: true,
-        data: {
-            name: 'Tree',
-            sex: 'M'
-        }
-    }
+    ctx.body = '崔叔的个人网站'
 })
 
 app.use(api.routes()).use(api.allowedMethods())
 
-app.listen(3000, () => {
-    console.log('[miniprogram-server] is starting at port 3000')
+app.listen(80, () => {
+    console.log('[miniprogram-server] is starting at port 80')
 })
