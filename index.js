@@ -6,6 +6,7 @@ const path = require('path')
 const fs = require('fs')
 const https = require('https')
 const bodyParser = require('koa-bodyparser')
+const modelsInit = require('./models/init')
 
 const dbUrl = 'mongodb://localhost:27017/miniprogram';
 const app = new Koa()
@@ -88,10 +89,11 @@ async function runServer() {
     await mongoose.connect(dbUrl);
     await app.listen(80)
     const options = {
-      key: fs.readFileSync('./ssl/private.key', 'utf8'),
-      cert: fs.readFileSync('./ssl/20190103.pem', 'utf8')
+      key: fs.readFileSync('./ssl/private.key'),
+      cert: fs.readFileSync('./ssl/20190103.pem')
     };
-    https.createServer(options, app.callback()).listen(443)
+    await https.createServer(options, app.callback()).listen(443)
+    modelsInit()
     console.log('[miniprogram-server] is starting at port 80')
   } catch (e) {
     console.error(e)
