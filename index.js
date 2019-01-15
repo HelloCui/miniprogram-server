@@ -56,12 +56,9 @@ api.post('/todo', async(ctx) => {
   }
 })
 
-api.put('/todo', async(ctx) => {
+api.put('/todo/:id', async(ctx) => {
   let body = ctx.request.body
-  let id = body.id
-  if(!id) {
-    throw({message: 'You don\'t have ID!'})
-  }
+  let id = ctx.params.id
   delete body.id
   let result = await Todo.updateOne({_id: id}, body)
   ctx.body = {
@@ -69,12 +66,9 @@ api.put('/todo', async(ctx) => {
   }
 })
 
-api.delete('/todo', async(ctx) => {
+api.delete('/todo/:id', async(ctx) => {
   let body = ctx.request.body
-  let id = body.id
-  if(!id) {
-    throw({message: 'You don\'t have ID!'})
-  }
+  let id = ctx.params.id
   let result = await Todo.deleteOne({_id: id})
   ctx.body = {
     status: true
