@@ -44,7 +44,12 @@ api.get('/', async(ctx) => {
 })
 
 api.get('/todos', async(ctx) => {
-  let result = await Todo.find({}).exec()
+  let result = await Todo.find({isFinished: {$ne: true}}).exec()
+  ctx.body = result
+})
+
+api.get('/todos/done', async(ctx) => {
+  let result = await Todo.find({isFinished: true}).exec()
   ctx.body = result
 })
 
@@ -57,6 +62,8 @@ api.post('/todo', async(ctx) => {
 })
 
 api.put('/todo/:id', async(ctx) => {
+  console.log(ctx.request)
+  console.log('body:', ctx.request.body)
   let body = ctx.request.body
   let id = ctx.params.id
   delete body.id
