@@ -7,14 +7,15 @@ const fs = require('fs')
 const https = require('https')
 const bodyParser = require('koa-bodyparser')
 const modelsInit = require('./models/init')
+const todoRoute = require('./routes/todo')
+const checkTodayRoute = require('./routes/checkToday')
+const startSchedule = require('./startSchedule.js')
 
 const dbUrl = 'mongodb://localhost:27017/miniprogram';
 const app = new Koa()
 let api = new Router()
 
 const mongoose = require('mongoose');
-
-const Todo = require('./models/todo')
 
 const staticPath = './static'
 
@@ -43,51 +44,16 @@ api.get('/', async(ctx) => {
   ctx.body = '崔叔的个人网站'
 })
 
-api.get('/todos', async(ctx) => {
-  let result = await Todo.find({isFinished: {$ne: true}}).exec()
-  ctx.body = result
-})
-
-api.get('/todos/done', async(ctx) => {
-  let result = await Todo.find({isFinished: true}).exec()
-  ctx.body = result
-})
-
-api.post('/todo', async(ctx) => {
-  let todo = new Todo(ctx.request.body)
-  await todo.save()
-  ctx.body = {
-    status: true
-  }
-})
-
-api.put('/todo/:id', async(ctx) => {
-  console.log(ctx.request)
-  console.log('body:', ctx.request.body)
-  let body = ctx.request.body
-  let id = ctx.params.id
-  delete body.id
-  let result = await Todo.updateOne({_id: id}, body)
-  ctx.body = {
-    status: true
-  }
-})
-
-api.delete('/todo/:id', async(ctx) => {
-  let body = ctx.request.body
-  let id = ctx.params.id
-  let result = await Todo.deleteOne({_id: id})
-  ctx.body = {
-    status: true
-  }
-})
+todoRoute(api)
+checkTodayRoute(api)
 
 app.use(api.routes()).use(api.allowedMethods())
 
 
 async function runServer() {
   try {
-    await mongoose.connect(dbUrl);
+    await mongoose.connect(dbUrl)
+    startSchedule()
     await app.listen(80)
     const options = {
       key: fs.readFileSync('./ssl/private.key'),
