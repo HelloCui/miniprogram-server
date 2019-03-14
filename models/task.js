@@ -2,8 +2,10 @@ let mongoose = require('mongoose')
 let Schema = mongoose.Schema
 
 let taskSchema = new Schema({
+  uid: Schema.Types.ObjectId, 
   title: {type: String, required: true},
   iconCode: Number,
+  isRemoved: Boolean
 })
 
 

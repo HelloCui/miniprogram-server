@@ -6,17 +6,16 @@ const path = require('path')
 const fs = require('fs')
 const https = require('https')
 const bodyParser = require('koa-bodyparser')
+//db
+const mongoose = require('mongoose')
 const modelsInit = require('./models/init')
-const todoRoute = require('./routes/todo')
-const checkTodayRoute = require('./routes/checkToday')
 const startSchedule = require('./startSchedule.js')
-
-const dbUrl = 'mongodb://localhost:27017/miniprogram';
+const dbUrl = 'mongodb://localhost:27017/miniprogram'
+//routers
+const userRouter = require('./routes/user')
+const todoRouter = require('./routes/todo')
+const checkTodayRouter = require('./routes/checkToday')
 const app = new Koa()
-let api = new Router()
-
-const mongoose = require('mongoose');
-
 const staticPath = './static'
 
 app.use(bodyParser())
@@ -39,16 +38,10 @@ app.on('error', (err) => {
   console.error('server error', err)
 });
 
-
-api.get('/', async(ctx) => {
-  ctx.body = '崔叔的个人网站'
+let routers = [userRouter, todoRouter, checkTodayRouter]
+routers.forEach(router => {
+  app.use(router.routes(), router.allowedMethods())
 })
-
-todoRoute(api)
-checkTodayRoute(api)
-
-app.use(api.routes()).use(api.allowedMethods())
-
 
 async function runServer() {
   try {
@@ -56,8 +49,8 @@ async function runServer() {
     startSchedule()
     await app.listen(80)
     const options = {
-      key: fs.readFileSync('./ssl/private.key'),
-      cert: fs.readFileSync('./ssl/20190103.pem')
+      key: fs.readFileSync('./ssl/https/private.key'),
+      cert: fs.readFileSync('./ssl/https/public.pem')
     };
     await https.createServer(options, app.callback()).listen(443)
     modelsInit()
