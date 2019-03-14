@@ -2,7 +2,7 @@ const Router = require('koa-router')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
 jsSHA = require('jssha')
-const User = require('../models/User')
+const User = require('../models/user')
 const ERR_MSG = require('../error/errmsg')
 const handleResErr = require('../error/handleResErr')
 
