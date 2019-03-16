@@ -5,24 +5,37 @@ const History = require('./models/history')
 const utils = require('./utils')
 
 async function moveToHistory() {
-  let todayList = await Today.find().exec()
-  await History.insertMany(todayList)
-  await Today.deleteMany({})
-  return true;
+  try {
+    let todayList = await Today.find().exec()
+    console.log('Inserting history at' + new Date())
+    await History.insertMany(todayList)
+    console.log('Insert history success. Removing today at ' + new Date())
+    await Today.deleteMany({})
+    console.log('Remove today success')
+    return true;
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 async function copyToToday() {
-  let insertDatas = []
-  let task = await Task.find().exec()
-  task.forEach(item => {
-    insertDatas.push({
-      task: item._id,
-      date: utils.getNowDate(),
-      isChecked: false
+  try {
+    let insertDatas = []
+    let task = await Task.find().exec()
+    task.forEach(item => {
+      insertDatas.push({
+        task: item._id,
+        date: utils.getNowDate(),
+        isChecked: false
+      })
     })
-  })
-  await Today.insertMany(insertDatas)
-  return true
+    console.log('Inserting today at' + new Date())
+    await Today.insertMany(insertDatas)
+    console.log('Insert today success' + new Date())
+    return true
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 module.exports = function() {

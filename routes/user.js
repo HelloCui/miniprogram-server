@@ -108,12 +108,10 @@ router.post('/login', async(ctx) => {
 router.get('/token', async(ctx) => {
   let refreshToken = ctx.query.refreshToken
   let token = ctx.query.token
-  console.log('refreshToken', refreshToken)
   if(!refreshToken || !token) {
     throw new Error('LIMITED_ACCESS')
   }
   decoded = jwt.verify(token, publicKey, {ignoreExpiration: true})
-  console.log('decoded', decoded)
   if(!decoded.uid) {
     throw new Error('LIMITED_ACCESS')
   }
