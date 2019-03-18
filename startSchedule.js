@@ -24,6 +24,7 @@ async function copyToToday() {
     let task = await Task.find().exec()
     task.forEach(item => {
       insertDatas.push({
+        uid: item.uid,
         task: item._id,
         date: utils.getNowDate(),
         isChecked: false
@@ -40,7 +41,7 @@ async function copyToToday() {
 
 module.exports = function() {
   // 每天0点定时任务
-  var preDay = schedule.scheduleJob('0 * * *', async function(){
+  var preDay = schedule.scheduleJob('0 0 * * *', async function(){
     await moveToHistory()
     await copyToToday()
   });
