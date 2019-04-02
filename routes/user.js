@@ -116,7 +116,7 @@ router.get('/token', async(ctx) => {
     throw new Error('LIMITED_ACCESS')
   }
   let user = await User.findOne({_id: decoded.uid}).exec()
-  if(user.refreshToken != refreshToken) {
+  if(!user || user.refreshToken != refreshToken) {
     throw new Error('LIMITED_ACCESS')
   }
   user.refreshToken = generateRefreshToken()

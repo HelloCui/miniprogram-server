@@ -12,8 +12,19 @@ router.get('/checktoday/task', async (ctx) => {
   ctx.body = result
 })
 
+router.get('/checktoday/task/:id', async (ctx) => {
+  let result = await Task.findOne({uid: ObjectId(ctx.passUser.uid), _id: ctx.params.id, isRemoved: {$ne: true}}).exec()
+  ctx.body = result
+})
+
+router.get('/checktoday/task/remind', async (ctx) => {
+  let result = await Task.find({uid: ObjectId(ctx.passUser.uid), isRemoved: {$ne: true}, isRemind: true}).exec()
+  ctx.body = result
+})
+
 router.post('/checktoday/task', async (ctx) => {
   let task = new Task(Object.assign({}, ctx.request.body, {uid: ObjectId(ctx.passUser.uid)}))
+  console.log(task)
   await task.save()
   let today = new Today({
     uid: ObjectId(ctx.passUser.uid),
