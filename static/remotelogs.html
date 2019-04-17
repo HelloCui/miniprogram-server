@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://unpkg.com/jquery-datetimepicker@2/jquery.datetimepicker.css">
+    <style media="screen">
+      .wrapper{
+        width: 80%;
+        margin: 30px auto 0;
+      }
+      #key {
+        width: 100%;
+        margin: 0 auto;
+        border-width: 0 0 1px 0;
+        border-style: dashed;
+        outline: none;
+        display: block;
+        font-size: 16px;
+        line-height: 30px;
+      }
+      .time-wrapper{
+        margin: 10px 0;
+      }
+      #start-time, #end-time{
+        border-width: 0 0 1px 0;
+        line-height: 20px;
+        border-color: #666;
+      }
+      .log-wrapper {
+        list-style: none;
+        margin-top: 30px;
+        padding: 0;
+      }
+      .log-wrapper>li {
+        padding: 10px 0;
+        border-bottom: 1px dotted #999;
+        display: flex;
+      }
+      .log-index{
+        min-width: 50px;
+      }
+      .log-content{
+        flex: auto;
+      }
+      .log-time{
+        flex: none;
+        padding-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <input type="text" id="key" placeholder="输入关键字">
+      <div class="time-wrapper">
+        <input id="start-time" type="text" placeholder="起始时间"> ~
+        <input id="end-time" type="text" placeholder="结束时间">
+      </div>
+      <ul class="log-wrapper"></ul>
+    </div>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.4.0.min.js"
+    integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery-datetimepicker@2/build/jquery.datetimepicker.full.min.js"
+    charset="utf-8"></script>
+  <script type="text/javascript">
+    var queryClone = {}
+    function init() {
+      var op = {
+        minDate: '2019/04/01',
+        maxDate: new Date(),
+        onChangeDateTime(){
+          getLogs()
+        }
+      }
+      $('#start-time').datetimepicker(op);
+      $('#end-time').datetimepicker(op);
+      $('#key').keyup(debounce(getLogs))
+      getData()
+    }
+    function getLogs(){
+      try{
+        var dirty = false
+        var query = {}
+        var key = $('#key').val()
+        var start = $('#start-time').val()
+        var end = $('#end-time').val()
+        query.content = key
+        if(start) {
+          query.start = new Date(start)
+        }
+        if(end) {
+          query.end = new Date(end)
+        }
+        for(p in query) {
+          if(query[p] instanceof Date){
+            dirty = query[p] - queryClone[p] != 0
+          } else {
+            dirty = query[p] != queryClone[p]
+          }
+          if(dirty) break;
+        }
+        if(dirty) {
+          getData(query)
+          queryClone = query
+        }
+      } catch(err){
+        console.error(err)
+      }
+    }
+    function getData(query) {
+      query = query || {}
+      $.get('http://localhost/remotelog', query, function(data) {
+        renderLogs(data)
+      });
+    }
+    function renderLogs(logs) {
+      var els = ''
+      for(var i = 0; i < logs.length; i++){
+        var item = logs[i]
+        var li = `<li>
+          <span class="log-index">${i+1}</span>
+          <span class="log-content">${item.content}</span>
+          <span class="log-time">${new Date(item.createdTime).toLocaleString()}</span></li>`
+        els += li
+      }
+      $('.log-wrapper').html(els)
+    }
+    function debounce(fun, interval) {
+      var interval = interval || 500, t
+      return function(){
+        clearTimeout(t)
+        t = setTimeout(function() {
+          fun.call(this, arguments)
+        }, interval)
+      }
+    }
+    $(document).ready(init)
+  </script>
+</html>

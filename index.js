@@ -15,6 +15,7 @@ const dbUrl = 'mongodb://localhost:27017/miniprogram'
 const userRouter = require('./routes/user')
 const todoRouter = require('./routes/todo')
 const checkTodayRouter = require('./routes/checkToday')
+const remoteLogRouter = require('./routes/remoteLog')
 const app = new Koa()
 const staticPath = './static'
 
@@ -38,7 +39,7 @@ app.on('error', (err) => {
   console.error('server error', err)
 });
 
-let routers = [userRouter, todoRouter, checkTodayRouter]
+let routers = [userRouter, todoRouter, checkTodayRouter, remoteLogRouter]
 routers.forEach(router => {
   app.use(router.routes(), router.allowedMethods())
 })

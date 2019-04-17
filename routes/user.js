@@ -9,7 +9,7 @@ const handleResErr = require('../error/handleResErr')
 const router = new Router()
 const privateKey = fs.readFileSync('./ssl/jwt/private.pem')
 const publicKey = fs.readFileSync('./ssl/jwt/public.pem')
-const permitRoute = ['canRegister', 'register', 'login', 'token']
+const permitRoute = ['canRegister', 'register', 'login', 'token', 'remotelog']
 
 router.all(/.*/, async(ctx, next) => {
   try {
@@ -38,6 +38,7 @@ router.all(/.*/, async(ctx, next) => {
       }
       ctx.status = 401
     } else {
+      console.log(e.message)
       ctx.body = {
         errmsg: e.message
       }
