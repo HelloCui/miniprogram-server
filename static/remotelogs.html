@@ -112,7 +112,7 @@
     }
     function getData(query) {
       query = query || {}
-      $.get('http://localhost/remotelog', query, function(data) {
+      $.get('/remotelog', query, function(data) {
         renderLogs(data)
       });
     }
